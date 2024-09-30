@@ -16,7 +16,7 @@ timezone: Asia/Kolkata
 
 title: Cyber Maya # the main title
 
-tagline: “In Cyber's Illusion, Lies Truth.” मायायाम् अभिध्यायाम् (Mayayam Abhidhyayam) “In the illusion, lies the intent.” # it will display as the subtitle
+tagline: "In Cyber's Illusion, Lies Truth."" मायायाम् अभिध्यायाम् (Mayayam Abhidhyayam) "In the illusion, lies the intent."" # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   CyberMaya, where we delve deep into the digital realm's illusions and truths.
@@ -31,7 +31,7 @@ github:
 # twitter:
   username: shaunakganorkar # change to your Twitter username
 
-social: Shaunak Ganorkar
+social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
   name: Shaunak Ganorkar
