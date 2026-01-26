@@ -1,1 +1,208 @@
 <!-- A placeholder to allow defining custom metadata -->
+<style>
+  /* Shimmer effect during loading only - stops when image is loaded */
+  @keyframes shimmer-loading {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  /* Shimmer effect for images that are loading */
+  .preview-img.shimmer,
+  .img-link.shimmer {
+    background: linear-gradient(
+      90deg,
+      #f0f0f0 0%,
+      #f8f8f8 20%,
+      #f0f0f0 40%,
+      #f0f0f0 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer-loading 1.5s infinite;
+  }
+  
+  /* Dark mode shimmer */
+  [data-mode="dark"] .preview-img.shimmer,
+  [data-mode="dark"] .img-link.shimmer {
+    background: linear-gradient(
+      90deg,
+      #2a2a2a 0%,
+      #333333 20%,
+      #2a2a2a 40%,
+      #2a2a2a 100%
+    );
+    background-size: 1000px 100%;
+  }
+  
+  /* Remove shimmer when image is loaded */
+  .preview-img.shimmer img.loaded,
+  img.preview-img.loaded,
+  .preview-img:not(.shimmer),
+  .img-link:not(.shimmer) {
+    animation: none !important;
+    background: none !important;
+  }
+  
+  /* Blur effect during loading */
+  .preview-img.blur img,
+  img.preview-img[data-lqip] {
+    filter: blur(10px);
+    transition: filter 0.3s ease;
+  }
+  
+  .preview-img.blur img.loaded,
+  img.preview-img.loaded {
+    filter: none !important;
+  }
+  
+  /* Ensure images are visible when loaded */
+  .preview-img,
+  .preview-img img,
+  img.preview-img {
+    transition: opacity 0.3s ease !important;
+    opacity: 1 !important;
+  }
+  
+  /* Ensure images load immediately without lazy loading effects */
+  img.preview-img[data-src],
+  img.preview-img[data-lqip] {
+    opacity: 1 !important;
+  }
+  
+  /* Shimmer effect on hover only */
+  @keyframes shimmer-hover {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  /* Ensure image containers can have overlay effects */
+  .preview-img,
+  img.preview-img {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Ensure full image is displayed without cropping - applies to all post images */
+  img.preview-img,
+  .preview-img img,
+  .post-meta img.preview-img,
+  article img.preview-img {
+    object-fit: contain !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    aspect-ratio: unset !important;
+    display: block !important;
+  }
+  
+  /* Ensure image wrapper doesn't constrain height */
+  .post-meta .mt-3.mb-3,
+  .post-meta > div:has(img.preview-img),
+  div.mt-3.mb-3:has(img.preview-img) {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Remove any fixed height constraints on image containers */
+  .preview-img {
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+  }
+  
+  /* Override any theme styles that might crop images */
+  img[width][height].preview-img {
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Apply shimmer on hover to preview images */
+  .preview-img:hover::after,
+  img.preview-img:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer-hover 1s infinite;
+    pointer-events: none;
+    display: block !important;
+    z-index: 1;
+  }
+  
+  /* Shimmer on hover for img-link wrapper */
+  .img-link:hover .preview-img::after,
+  .img-link:hover img.preview-img::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer-hover 1s infinite;
+    pointer-events: none;
+    display: block !important;
+    z-index: 1;
+  }
+</style>
+
+<script>
+  // Remove shimmer class when images are loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('.preview-img.shimmer img, img.preview-img.shimmer, .img-link.shimmer img');
+    
+    images.forEach(function(img) {
+      // If image is already loaded
+      if (img.complete && img.naturalHeight !== 0) {
+        img.classList.add('loaded');
+        const container = img.closest('.preview-img.shimmer, .img-link.shimmer');
+        if (container) {
+          container.classList.remove('shimmer');
+        }
+      } else {
+        // Wait for image to load
+        img.addEventListener('load', function() {
+          this.classList.add('loaded');
+          const container = this.closest('.preview-img.shimmer, .img-link.shimmer');
+          if (container) {
+            container.classList.remove('shimmer');
+          }
+        });
+        
+        // Handle load errors
+        img.addEventListener('error', function() {
+          this.classList.add('loaded');
+          const container = this.closest('.preview-img.shimmer, .img-link.shimmer');
+          if (container) {
+            container.classList.remove('shimmer');
+          }
+        });
+      }
+    });
+  });
+</script>

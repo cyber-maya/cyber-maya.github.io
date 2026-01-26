@@ -21,23 +21,36 @@
     constructor() {
       let self = this;
 
+      // Initialize the mode on page load
+      if (this.hasMode) {
+        // If user has a saved preference, use it
+        if (this.isDarkMode) {
+          this.setDark();
+        } else {
+          this.setLight();
+        }
+      } else {
+        // If no saved preference, follow system preference
+        if (this.isPreferDark) {
+          document.documentElement.setAttribute(ModeToggle.MODE_ATTR, ModeToggle.DARK_MODE);
+        } else {
+          document.documentElement.setAttribute(ModeToggle.MODE_ATTR, ModeToggle.LIGHT_MODE);
+        }
+      }
+
       {%- comment -%} always follow the system prefers {%- endcomment -%}
       this.sysDarkPrefers.addEventListener('change', () => {
         if (self.hasMode) {
           self.clearMode();
         }
+        // Update DOM to reflect system preference
+        if (self.isPreferDark) {
+          document.documentElement.setAttribute(ModeToggle.MODE_ATTR, ModeToggle.DARK_MODE);
+        } else {
+          document.documentElement.setAttribute(ModeToggle.MODE_ATTR, ModeToggle.LIGHT_MODE);
+        }
         self.notify();
       });
-
-      if (!this.hasMode) {
-        return;
-      }
-
-      if (this.isDarkMode) {
-        this.setDark();
-      } else {
-        this.setLight();
-      }
     }
 
     get sysDarkPrefers() {
@@ -98,19 +111,59 @@
     }
 
     flipMode() {
-      if (this.hasMode) {
-        this.clearMode();
+      // Get current effective mode (saved preference or system preference)
+      const currentMode = this.modeStatus;
+      
+      // Toggle to the opposite mode
+      if (currentMode === ModeToggle.DARK_MODE) {
+        this.setLight();
       } else {
-        if (this.isPreferDark) {
-          this.setLight();
-        } else {
-          this.setDark();
-        }
+        this.setDark();
       }
 
       this.notify();
     }
   }
 
+  // Create modeToggle instance
   const modeToggle = new ModeToggle();
+  
+  // Make modeToggle globally accessible for debugging
+  window.modeToggle = modeToggle;
+  
+  // Attach click event to the mode toggle button
+  function attachToggleHandler() {
+    const toggleButton = document.getElementById(ModeToggle.ID);
+    if (toggleButton) {
+      // Remove any existing listeners by cloning the button
+      if (toggleButton.hasAttribute('data-listener-attached')) {
+        return; // Already attached
+      }
+      
+      toggleButton.setAttribute('data-listener-attached', 'true');
+      
+      toggleButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        modeToggle.flipMode();
+      });
+    }
+  }
+  
+  // Multiple strategies to ensure the button is found
+  // Strategy 1: DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachToggleHandler);
+  } else {
+    // DOM is already loaded
+    attachToggleHandler();
+  }
+  
+  // Strategy 2: Window load (everything including images)
+  window.addEventListener('load', attachToggleHandler);
+  
+  // Strategy 3: Multiple timeouts as fallback
+  setTimeout(attachToggleHandler, 50);
+  setTimeout(attachToggleHandler, 200);
+  setTimeout(attachToggleHandler, 500);
 </script>

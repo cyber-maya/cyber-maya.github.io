@@ -225,3 +225,5 @@ jekyll-archives:
   permalinks:
     tag: /tags/:name/
     category: /categories/:name/
+  # Ensure tag names are slugified for consistent URLs
+  slugify: true
